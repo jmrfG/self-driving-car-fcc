@@ -13,14 +13,61 @@ class Car {
         this.friction = 0.05;
         this.angle = 0
 
+        this.collision = false
         this.sensor = new Sensor(this);
 
         this.hotkeys = new Control();
     }
 
     update(road_borders){
-        this.#move();
+        if (!this.collision) {
+            this.#move();
+            this.polygon = this.#createPolygon();
+            this.collision =this.#checkCollision(road_borders);
+        }
+        
         this.sensor.update(road_borders);
+    }
+
+
+
+    #checkCollision(road_borders){
+        for (let i = 0; i < road_borders.length; i++) {
+            if (polyIntersect(this.polygon, road_borders[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    #createPolygon(){
+        const points = [];
+        const radius = Math.hypot(this.w/2, this.h/2);
+        const alpha = Math.atan2(this.w, this.h);
+
+        
+
+        points.push(
+            {
+            x:this.x - Math.sin(this.angle - alpha) * radius,
+            y:this.y-Math.cos(this.angle - alpha)* radius
+            });
+        points.push(
+            {
+            x:this.x - Math.sin(this.angle + alpha) * radius,
+            y:this.y - Math.cos(this.angle + alpha)* radius
+            });
+        points.push(
+            {
+            x:this.x - Math.sin(Math.PI + this.angle - alpha) * radius,
+            y:this.y-Math.cos(Math.PI + this.angle - alpha)* radius
+            });
+        points.push(
+            {
+            x:this.x - Math.sin(Math.PI + this.angle + alpha) * radius,
+            y:this.y-Math.cos(Math.PI + this.angle + alpha)* radius
+            });
+        return points
     }
 
     #move(){
@@ -63,19 +110,17 @@ class Car {
     }
 
     draw(context) {
-        context.save();
-        context.translate(this.x, this.y);
-        context.rotate(-this.angle)
+        if (this.collision) {
+            context.fillStyle = "gray";
+        } else {
+            context.fillStyle = "black";
+        }
         context.beginPath();
-        context.rect(
-            - (this.w/2),
-            - (this.h/2),
-            this.w,
-            this.h
-        );
-        context.fill();
-        context.restore();
-        
+        context.moveTo(this.polygon[0].x, this.polygon[0].y);
+        for (let index = 0; index < this.polygon.length; index++) {
+            context.lineTo(this.polygon[index].x, this.polygon[index].y)        
+        }
+        context.fill();        
         this.sensor.draw(context);
     }
 

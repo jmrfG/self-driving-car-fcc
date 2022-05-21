@@ -64,8 +64,9 @@ class Sensor {
     }
 
     draw(ctx){
-        for(let i=0;i<this.rayCount;i++){
-            let end=this.rays[i][1];
+        let i = 0
+        this.rays.forEach(r=> {
+            let end=r[1];
             if(this.border_collisions[i]){
                 end=this.border_collisions[i];
             }
@@ -74,8 +75,8 @@ class Sensor {
             ctx.lineWidth=2;
             ctx.strokeStyle="red";
             ctx.moveTo(
-                this.rays[i][0].x,
-                this.rays[i][0].y
+                r[0].x,
+                r[0].y
             );
             ctx.lineTo(
                 end.x,
@@ -87,14 +88,15 @@ class Sensor {
             ctx.lineWidth=2;
             ctx.strokeStyle="black";
             ctx.moveTo(
-                this.rays[i][1].x,
-                this.rays[i][1].y
+                r[1].x,
+                r[1].y
             );
             ctx.lineTo(
                 end.x,
                 end.y
             );
             ctx.stroke();
-        }
+            i++
+        })
     }  
 }
