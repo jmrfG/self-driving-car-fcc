@@ -1,11 +1,17 @@
 class Control {
 
-    constructor(){
+    constructor(type){
         this.up = false;
         this.down = false;
         this.left = false;
-        this.right = false;
-        this.#addKeyboardListeners();
+        switch (type) {
+            case 1:
+                this.#addKeyboardListeners();
+                break;
+            case 0:
+                this.up = true;
+        }
+        
     }
 
     #addKeyboardListeners(){
