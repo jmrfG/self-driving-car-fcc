@@ -1,36 +1,40 @@
-const canvas = document.getElementById("container")
-canvas.width = 300;
+const carCanvas = document.getElementById("container");
+const netCanvas = document.getElementById("netCanvas");
+netCanvas.width = 400;
+carCanvas.width = 300;
 
-const context = canvas.getContext("2d");
-const road = new Road(canvas.width / 2, canvas.width * 0.9);
+const carContext = carCanvas.getContext("2d")
+const netContext = netCanvas.getContext("2d");
+const road = new Road(carCanvas.width / 2, carCanvas.width * 0.9);
 const car = new Car(road.getLaneCenter(2), 100, 30, 50, 1);
 
 const traffic = [
     new Car(road.getLaneCenter(2), -100, 30, 50, 0, 2)
 
 ]
+console.log(car.brain);
 
 updateAnimation();
 
-function updateAnimation() {
+function updateAnimation(time) {
     for (let i = 0; i < traffic.length; i++) {
         traffic[i].update(road.borders, []);
     }
     car.update(road.borders, traffic);
-    canvas.height = window.innerHeight;
-    context.save();
-    context.translate(0, -car.y + canvas.height * 0.8)
-    road.draw(context);
+    carCanvas.height = window.innerHeight;
+    netCanvas.height = window.innerHeight;
+    carContext.save();
+    carContext.translate(0, -car.y + carCanvas.height * 0.8)
+    road.draw(carContext);
     for (let i = 0; i < traffic.length; i++) {
-        traffic[i].draw(context);
+        traffic[i].draw(carContext);
     }
-    car.draw(context);
-    context.restore();
-    for (let i = 0; i < traffic.length; i++) {
-        if (traffic[i].outSide(canvas.height) == true) {
-            console.log(canvas.height)
-        }
-    }
+    car.draw(carContext);
+    carContext.restore();
+
+    netContext.lineDashOffset = -time / 50;
+
+    Visualizer.drawNetwork(netContext, car.brain);
     //Callback the same function again and again
     requestAnimationFrame(updateAnimation);
 }

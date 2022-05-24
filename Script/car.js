@@ -12,25 +12,39 @@ class Car {
         this.maxSpeed = maxSpeed;
         this.friction = 0.05;
         this.angle = 0;
-
+        this.useBrain = playable;
         this.collision = false;
 
         if (playable == 1) {
             this.sensor = new Sensor(this);
+            this.brain = new NeuralNetwork(
+                [this.sensor.rayCount, 6, 4]
+            );
         }
 
         this.hotkeys = new Control(this.playable);
     }
 
     update(road_borders, traffic) {
+        let outputs;
         if (!this.collision) {
             this.#move();
             this.polygon = this.#createPolygon();
             this.collision = this.#checkCollision(road_borders, traffic);
         }
         if (this.sensor) {
-
             this.sensor.update(road_borders, traffic);
+            const offsets = this.sensor.border_collisions.map(
+                s => s == null ? 0 : 1 - s.offset
+            );
+            outputs = NeuralNetwork.feedForward(offsets, this.brain)
+            //console.log(outputs)
+        }
+        if (this.useBrain == 1) {
+            this.hotkeys.up = outputs[0];
+            this.hotkeys.left = outputs[1];
+            this.hotkeys.right = outputs[2];
+            this.hotkeys.down = outputs[3];
         }
     }
 
