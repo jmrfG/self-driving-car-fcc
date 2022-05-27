@@ -20,6 +20,30 @@ class NeuralNetwork {
         }
         return outputs;
     }
+
+    static mutate(neurons, seed = 1) {
+        neurons.levels.forEach(
+            lvl => {
+                for (let index = 0; index < lvl.biases.length; index++) {
+                    lvl.biases[index] = linear_interpolation(
+                        lvl.biases[index],
+                        Math.random() * 2 - 1,
+                        seed
+                    );
+                }
+
+                for (let index = 0; index < lvl.weight.length; index++) {
+                    for (let j = 0; j < lvl.weight[index]; j++) {
+                        lvl.weights[index][j] = linear_interpolation(
+                            lvl.weights[index][j],
+                            Math.random() * 2 - 1,
+                            seed
+                        );
+                    }
+                }
+            }
+        );
+    }
 }
 
 
